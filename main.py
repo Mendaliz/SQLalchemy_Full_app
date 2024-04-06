@@ -1,8 +1,9 @@
 from flask import Flask, render_template, redirect, request, make_response, session, abort, jsonify
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from flask_restful import reqparse, abort, Api, Resource
 
 import datetime
-from data import db_session, jobs_api, users_api
+from data import db_session, jobs_api, users_api, users_resources, jobs_resources
 from data.users import User
 from data.jobs import Jobs
 from data.departments import Departments
@@ -15,6 +16,16 @@ from forms.user import RegisterForm
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(days=365)
+
+api = Api(app)
+# для списка объектов
+api.add_resource(users_resources.UsersListResource, '/api/v2/users')
+# для одного объекта
+api.add_resource(users_resources.UserResource, '/api/v2/users/<int:user_id>')
+# для списка объектов
+api.add_resource(jobs_resources.JobsListResource, '/api/v2/jobs')
+# для одного объекта
+api.add_resource(jobs_resources.JobResource, '/api/v2/jobs/<int:job_id>')
 
 login_manager = LoginManager()
 login_manager.init_app(app)
